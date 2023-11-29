@@ -4,18 +4,18 @@ using HtmlAgilityPack;
 
 namespace apex_legends_buddy_api.Services;
 
-class Response
+private class GamepediaResponse
 {
     public Parse parse { get; set; } = new Parse();
 }
 
-class Parse
+private class Parse
 {
     public string title { get; set; } = string.Empty;
     public Text text { get; set; }
 }
 
-class Text
+private class Text
 {
     [JsonPropertyName("*")] public string? Asterisk { get; set; }
 }
@@ -34,7 +34,7 @@ public class GamepediaService
     {
         const string url = "api.php?action=parse&format=json&page=Legends&redirects=1";
 
-        var response = await _httpClient.GetFromJsonAsync<Response>(url);
+        GamepediaResponse response = await _httpClient.GetFromJsonAsync<Response>(url);
 
         if (response == null)
         {
@@ -80,11 +80,11 @@ public class GamepediaService
         }
 
 
-        return list;
+        return list
     }
 
     private string CleanImageUrl(string url)
     {
-        return string.IsNullOrEmpty(url) ? url.Substring(0, url.IndexOf("/revision/", StringComparison.Ordinal)) : url;
+        return !string.IsNullOrEmpty(url) ? url.Substring(0, url.IndexOf("/revision/", StringComparison.Ordinal)) : url;
     }
 }
