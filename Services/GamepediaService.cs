@@ -15,7 +15,6 @@ public class GamepediaService
     public async Task<object?> GetLegends()
     {
         const string url = "api.php?action=parse&format=json&page=Legends&redirects=1";
-
         var response = await _httpClient.GetFromJsonAsync<GamepediaResponse>(url);
 
         if (response == null)
@@ -23,7 +22,7 @@ public class GamepediaService
             return null;
         }
 
-        string? html = response.Parse.Text.Asterisk;
+        var html = response.Parse.Text.Asterisk;
 
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
@@ -31,7 +30,7 @@ public class GamepediaService
         var elements = htmlDocument.DocumentNode.SelectNodes(
             ".//ul[contains(@class, 'gallery') and contains(@class, 'mw-gallery-nolines')]//li[contains(@class, 'gallerybox')]");
 
-        var list = new List<dynamic>();
+        var list = new List<Legend>();
 
         foreach (var element in elements)
         {
@@ -55,7 +54,15 @@ public class GamepediaService
                 .PreviousSibling
                 .SelectSingleNode(".//a//img").GetAttributeValue("data-src", ""));
 
-            list.Add(new { name, description, imageUrl, classIconUrl, className, classDescription });
+            list.Add(new Legend()
+            {
+                Name = name,
+                Description = description,
+                ImageUrl = imageUrl,
+                ClassName = className,
+                ClassDescription = classDescription,
+                ClassIconUrl = classIconUrl
+            });
         }
 
 
