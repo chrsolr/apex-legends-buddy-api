@@ -1,24 +1,6 @@
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using HtmlAgilityPack;
 
 namespace apex_legends_buddy_api.Services;
-
-private class GamepediaResponse
-{
-    public Parse parse { get; set; } = new Parse();
-}
-
-private class Parse
-{
-    public string title { get; set; } = string.Empty;
-    public Text text { get; set; }
-}
-
-private class Text
-{
-    [JsonPropertyName("*")] public string? Asterisk { get; set; }
-}
 
 public class GamepediaService
 {
@@ -34,14 +16,14 @@ public class GamepediaService
     {
         const string url = "api.php?action=parse&format=json&page=Legends&redirects=1";
 
-        GamepediaResponse response = await _httpClient.GetFromJsonAsync<Response>(url);
+        var response = await _httpClient.GetFromJsonAsync<GamepediaResponse>(url);
 
         if (response == null)
         {
             return null;
         }
 
-        string? html = response.parse.text.Asterisk;
+        string? html = response.Parse.Text.Asterisk;
 
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
@@ -69,18 +51,15 @@ public class GamepediaService
 
             var classDescription = element.ParentNode.PreviousSibling.PreviousSibling.InnerText.Trim();
 
-
             var classIconUrl = CleanImageUrl(element.ParentNode.PreviousSibling.PreviousSibling.PreviousSibling
                 .PreviousSibling
                 .SelectSingleNode(".//a//img").GetAttributeValue("data-src", ""));
 
             list.Add(new { name, description, imageUrl, classIconUrl, className, classDescription });
-
-            Console.WriteLine($"{name}, {description}");
         }
 
 
-        return list
+        return list;
     }
 
     private string CleanImageUrl(string url)

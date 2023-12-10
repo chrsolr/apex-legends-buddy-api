@@ -1,4 +1,5 @@
 global using apex_legends_buddy_api.Services;
+global using apex_legends_buddy_api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
