@@ -5,7 +5,7 @@ namespace apex_legends_buddy_api.Controllers;
 
 [ApiController]
 [Route("api/v1/legends")]
-public class LegendsController(GamepediaService gamepediaService) : ControllerBase
+public class LegendsController(IGamepediaService gamepediaService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get()

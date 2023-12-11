@@ -1,5 +1,4 @@
 using System.Globalization;
-using apex_legends_buddy_api.Interfaces;
 using HtmlAgilityPack;
 
 namespace apex_legends_buddy_api.Services;
