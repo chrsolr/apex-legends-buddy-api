@@ -1,5 +1,7 @@
 global using apex_legends_buddy_api.Services;
 global using apex_legends_buddy_api.Models;
+global using apex_legends_buddy_api.Shared;
+global using apex_legends_buddy_api.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<GamepediaService>();
+builder.Services.AddHttpClient<ApexTrackerService>();
+
+// Services/Repository
+builder.Services
+    .AddScoped<IGamepediaService, GamepediaService>()
+    .AddScoped<IApexTrackerService, ApexTrackerService>();
 
 var app = builder.Build();
 

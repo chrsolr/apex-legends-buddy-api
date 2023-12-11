@@ -8,4 +8,5 @@ public class Legend
     public string ClassIconUrl { get; set; }
     public string ClassName { get; set; }
     public string ClassDescription { get; set; }
+    public UsageRate? UsageRate { get; set; }
 }
