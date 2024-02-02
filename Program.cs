@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddHttpClient<GamepediaService>();
 
 builder.Services.AddScoped<IGamepediaService, GamepediaService>();
 
