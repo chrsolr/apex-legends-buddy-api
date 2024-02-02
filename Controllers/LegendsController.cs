@@ -1,22 +1,5 @@
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 
-namespace apex_legends_buddy_api.Controllers;
-
+[Route("api/v1/[controller]")]
 [ApiController]
-[Route("api/v1/legends")]
-public class LegendsController(IGamepediaService gamepediaService) : ControllerBase
-{
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        var legends = await gamepediaService.GetLegends();
-
-        if (legends is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(legends);
-    }
-}
+public class LegendsController : ControllerBase { }
