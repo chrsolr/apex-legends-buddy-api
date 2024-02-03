@@ -7,7 +7,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<GamepediaService>();
 
-builder.Services.AddScoped<IGamepediaService, GamepediaService>();
+builder
+    .Services.AddScoped<IGamepediaService, GamepediaService>()
+    .AddScoped<IApexTrackerService, ApexTrackerService>();
 
 var app = builder.Build();
 
