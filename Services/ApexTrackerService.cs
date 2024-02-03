@@ -64,6 +64,7 @@ public class ApexTrackerService : IApexTrackerService
                 Rate = (element?.UsageRate ?? 0).ToString(CultureInfo.InvariantCulture),
                 KPM = kpms.Find(kpm => kpm.Name == element?.Name)!.KPM ?? "N/A"
             })
+            .OrderBy(usage => usage.Name)
             .ToList();
     }
 }

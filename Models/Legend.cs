@@ -1,10 +1,9 @@
 public class Legend
 {
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public string ImageUrl { get; set; }
-    public string ClassIconUrl { get; set; }
-    public string ClassName { get; set; }
-    public string ClassDescription { get; set; }
-    public UsageRate UsageRate { get; set; }
+    public required string Name { get; init; }
+    public required string Description { get; init; }
+    public required string ImageUrl { get; init; }
+    public required string ClassIconUrl { get; init; }
+    public required string ClassName { get; init; }
+    public required string ClassDescription { get; init; }
 }

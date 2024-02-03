@@ -69,7 +69,7 @@ public class GamepediaService : IGamepediaService
                 ClassName = className,
                 ClassDescription = classDescription,
                 ClassIconUrl = Utils.CleanRevisionImageUrl(classIconUrl),
-                UsageRate = insights.Find(insight => insight.Name == name)
+                // UsageRate = insights.Find(insight => insight.Name == name)
             }
         ).OrderBy(legend => legend.Name).ToList();
     }

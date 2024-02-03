@@ -1,6 +1,6 @@
-public class UsageRate
+public record UsageRate
 {
-    public string Name { get; set; }
-    public string Rate { get; set; }
-    public string KPM { get; set; }
+    public required string Name { get; set; }
+    public required string Rate { get; set; }
+    public required string KPM { get; set; }
 }
