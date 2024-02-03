@@ -12,9 +12,9 @@ public class UsageRateController : ControllerBase
     }
 
     [HttpGet("usage-rate")]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] string? legendName)
     {
-        var usageRate = await apexTrackerService.GetUsageRates();
+        var usageRate = await apexTrackerService.GetUsageRates(legendName);
         if (usageRate is null)
         {
             return NotFound();

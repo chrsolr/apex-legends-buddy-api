@@ -3,15 +3,13 @@ using HtmlAgilityPack;
 public class GamepediaService : IGamepediaService
 {
     private readonly HttpClient httpClient;
-    private readonly IApexTrackerService apexTrackerService;
 
-    public GamepediaService(HttpClient _httpClient, IApexTrackerService _apexTrackerService)
+    public GamepediaService(HttpClient _httpClient)
     {
         httpClient = _httpClient;
-        apexTrackerService = _apexTrackerService;
     }
 
-    public async Task<List<Legend>> GetLegends()
+    public async Task<List<Legend>> GetLegends(string? legendName)
     {
         const string url =
             "https://apexlegends.gamepedia.com/api.php?action=parse&format=json&page=Legends&redirects=1";
@@ -22,7 +20,6 @@ public class GamepediaService : IGamepediaService
             throw new Exception("Failed to get legends from Service");
         }
 
-        var insights = await apexTrackerService.GetUsageRates();
         var html = response.Parse.Text.Asterisk;
         var document = new HtmlDocument();
         document.LoadHtml(html);
@@ -31,7 +28,7 @@ public class GamepediaService : IGamepediaService
             ".//ul[contains(@class, 'gallery') and contains(@class, 'mw-gallery-nolines')]//li[contains(@class, 'gallerybox')]"
         );
 
-        return (
+        var legends = (
             from element in elements
             let imageNode = element.SelectSingleNode(
                 ".//div[contains(@class, 'thumb')]//div//a//img"
@@ -69,8 +66,11 @@ public class GamepediaService : IGamepediaService
                 ClassName = className,
                 ClassDescription = classDescription,
                 ClassIconUrl = Utils.CleanRevisionImageUrl(classIconUrl),
-                // UsageRate = insights.Find(insight => insight.Name == name)
             }
-        ).OrderBy(legend => legend.Name).ToList();
+        ).OrderBy(legend => legend.Name);
+
+        return string.IsNullOrEmpty(legendName)
+            ? legends.ToList()
+            : legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper()).ToList();
     }
 }
