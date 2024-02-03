@@ -6,14 +6,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<GamepediaService>();
-
+builder.Services.AddHttpClient<ApexTrackerService>();
 builder
     .Services.AddScoped<IGamepediaService, GamepediaService>()
     .AddScoped<IApexTrackerService, ApexTrackerService>();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -22,5 +20,4 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
-
 app.Run();
