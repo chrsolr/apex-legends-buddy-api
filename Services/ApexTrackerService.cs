@@ -10,7 +10,7 @@ public class ApexTrackerService : IApexTrackerService
         httpClient = _httpClient;
     }
 
-    public async Task<List<UsageRate>> GetUsageRates()
+    public async Task<List<UsageRate>> GetUsageRates(string? legendName)
     {
         const string url = "https://tracker.gg/apex/insights";
         httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
@@ -57,14 +57,17 @@ public class ApexTrackerService : IApexTrackerService
             select new { Name = name, KPM = kpm ?? "N/A" }
         ).ToList();
 
-        return usage
+        var usageRates = usage
             .Select(element => new UsageRate()
             {
                 Name = element.Name,
                 Rate = (element?.UsageRate ?? 0).ToString(CultureInfo.InvariantCulture),
                 KPM = kpms.Find(kpm => kpm.Name == element?.Name)!.KPM ?? "N/A"
             })
-            .OrderBy(usage => usage.Name)
-            .ToList();
+            .OrderBy(usage => usage.Name);
+
+        return string.IsNullOrEmpty(legendName)
+            ? usageRates.ToList()
+            : usageRates.Where(u => u.Name.ToUpper() == legendName.ToUpper()).ToList();
     }
 }

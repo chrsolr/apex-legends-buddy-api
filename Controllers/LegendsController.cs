@@ -12,9 +12,9 @@ public class LegendsController : ControllerBase
     }
 
     [HttpGet("legends")]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] string? legendName)
     {
-        var legends = await gamepediaService.GetLegends();
+        var legends = await gamepediaService.GetLegends(legendName);
         if (legends is null)
         {
             return NotFound();
