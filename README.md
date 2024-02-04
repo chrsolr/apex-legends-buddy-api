@@ -1,6 +1,5 @@
 ### Needs
 
-- Web Api
 - JWT Based
 - JWT Refresh
 - Docker and Docker-Compose
