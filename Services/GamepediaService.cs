@@ -12,6 +12,71 @@ public class GamepediaService : IGamepediaService
         context = _context;
     }
 
+    public async Task<List<LegendDTO>> GetLegends()
+    {
+        return await context
+            .Legends.Select(legend => new LegendDTO()
+            {
+                Name = legend.Name,
+                Description = legend.Description,
+                ImageUrl = legend.ImageUrl,
+                ClassName = legend.Class.Name,
+                ClassDescription = legend.Class.Description,
+                ClassIconUrl = legend.Class.IconUrl
+            })
+            .OrderBy(legend => legend.Name)
+            .ToListAsync();
+    }
+
+    public async Task UpdateLegends(string? legendName)
+    {
+        var legends = await GetLegendsFromWiki(legendName);
+        foreach (var legend in legends)
+        {
+            if (context.Legends.Any(v => v.Name == legend.Name))
+            {
+                continue;
+            }
+
+            var legendClass = context.LegendClasses.FirstOrDefault(v => v.Name == legend.ClassName);
+            context.Legends.Add(
+                new Legend()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = legend.Name,
+                    Description = legend.Description,
+                    ImageUrl = legend.ImageUrl,
+                    Class =
+                        legendClass
+                        ?? new LegendClass()
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = legend.ClassName,
+                            Description = legend.ClassDescription,
+                            IconUrl = legend.ClassIconUrl,
+                        }
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<LegendDTO?> GetLegendsByName(string legendName)
+    {
+        return await context
+            .Legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper())
+            .Select(legend => new LegendDTO()
+            {
+                Name = legend.Name,
+                Description = legend.Description,
+                ImageUrl = legend.ImageUrl,
+                ClassName = legend.Class.Name,
+                ClassDescription = legend.Class.Description,
+                ClassIconUrl = legend.Class.IconUrl
+            })
+            .FirstOrDefaultAsync();
+    }
+
     private async Task<List<LegendDTO>> GetLegendsFromWiki(string? legendName)
     {
         const string url =
@@ -75,59 +140,5 @@ public class GamepediaService : IGamepediaService
         return string.IsNullOrEmpty(legendName)
             ? legends.ToList()
             : legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper()).ToList();
-    }
-
-    public async Task<List<LegendDTO>> GetLegends(string? legendName)
-    {
-        var legends = await context
-            .Legends.Select(legend => new LegendDTO()
-            {
-                Name = legend.Name,
-                Description = legend.Description,
-                ImageUrl = legend.ImageUrl,
-                ClassName = legend.Class.Name,
-                ClassDescription = legend.Class.Description,
-                ClassIconUrl = legend.Class.IconUrl
-            })
-            .OrderBy(legend => legend.Name)
-            .ToListAsync();
-
-        return string.IsNullOrEmpty(legendName)
-            ? legends.ToList()
-            : legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper()).ToList();
-    }
-
-    public async Task UpdateLegends(string? legendName)
-    {
-        var legends = await GetLegends(legendName);
-
-        foreach (var legend in legends)
-        {
-            if (context.Legends.Any(v => v.Name == legend.Name))
-            {
-                continue;
-            }
-
-            var legendClass = context.LegendClasses.FirstOrDefault(v => v.Name == legend.ClassName);
-            context.Legends.Add(
-                new Legend()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = legend.Name,
-                    Description = legend.Description,
-                    ImageUrl = legend.ImageUrl,
-                    Class =
-                        legendClass
-                        ?? new LegendClass()
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = legend.ClassName,
-                            Description = legend.ClassDescription,
-                            IconUrl = legend.ClassIconUrl,
-                        }
-                }
-            );
-            await context.SaveChangesAsync();
-        }
     }
 }
