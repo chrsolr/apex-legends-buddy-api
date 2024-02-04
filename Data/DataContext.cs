@@ -7,4 +7,5 @@ public class DataContext : DbContext
 
     public DbSet<Legend> Legends => Set<Legend>();
     public DbSet<UsageRate> UsageRates => Set<UsageRate>();
+    public DbSet<LegendClass> LegendClasses => Set<LegendClass>();
 }
