@@ -12,14 +12,34 @@ public class UsageRateController : ControllerBase
     }
 
     [HttpGet("usage-rate")]
-    public async Task<IActionResult> Get([FromQuery] string? legendName)
+    public async Task<IActionResult> Get()
     {
-        var usageRate = await apexTrackerService.GetUsageRates(legendName);
+        var usageRate = await apexTrackerService.GetLegendUsageRates();
         if (usageRate is null)
         {
             return NotFound();
         }
 
         return Ok(usageRate);
+    }
+
+    [HttpGet("usage-rate/{legendName}")]
+    public async Task<IActionResult> GetByName(string legendName)
+    {
+        var usageRate = await apexTrackerService.GetLegendUsageRateByName(legendName);
+        if (usageRate is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(usageRate);
+    }
+
+    // TODO: Add Authorize and Authentication
+    [HttpPost("usage-rate")]
+    public async Task<IActionResult> Post()
+    {
+        await apexTrackerService.UpdateLegendUsageRates();
+        return Ok();
     }
 }
