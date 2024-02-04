@@ -1,4 +1,4 @@
 public interface IGamepediaService
 {
-    public Task<List<Legend>> GetLegends(string? legendName);
+    public Task<List<LegendDTO>> GetLegends(string? legendName);
 }

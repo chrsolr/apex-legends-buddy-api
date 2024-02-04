@@ -1,4 +1,4 @@
 public interface IApexTrackerService
 {
-    public Task<List<UsageRate>> GetUsageRates(string? legendName);
+    public Task<List<UsageRateDTO>> GetUsageRates(string? legendName);
 }
