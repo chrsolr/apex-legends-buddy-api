@@ -6,6 +6,7 @@
 - Unit Test
 - AutoMapper?
 - .env file Support
+- Move this Readme information to another file
 
 ### Commands
 
