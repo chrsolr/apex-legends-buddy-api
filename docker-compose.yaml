@@ -1,0 +1,35 @@
+networks:
+  apex-legends-buddy-api:
+    driver: bridge
+
+services:
+  # api:
+  #   image: apex-legends-buddy-api:latest
+  #   container_name: apex-legends-buddy-api
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   depends_on:
+  #     - mssql
+  #   env_file:
+  #     - .env.docker
+  #   ports:
+  #     - 5080:9000
+  #   networks:
+  #     - apex-legends-buddy-api
+
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: S3CR3T_P8SS
+    ports:
+      - 1433:1433
+    volumes:
+      - sqlserver:/var/opt/mssql
+    networks:
+      - apex-legends-buddy-api
+
+volumes:
+  sqlserver:
