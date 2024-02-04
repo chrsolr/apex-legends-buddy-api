@@ -22,4 +22,11 @@ public class LegendsController : ControllerBase
 
         return Ok(legends);
     }
+
+    [HttpPost("legends")]
+    public async Task<IActionResult> Post([FromQuery] string? legendName)
+    {
+        await gamepediaService.UpdateLegends(legendName);
+        return Ok();
+    }
 }
