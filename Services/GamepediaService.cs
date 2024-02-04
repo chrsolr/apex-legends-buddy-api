@@ -9,7 +9,7 @@ public class GamepediaService : IGamepediaService
         httpClient = _httpClient;
     }
 
-    public async Task<List<Legend>> GetLegends(string? legendName)
+    public async Task<List<LegendDTO>> GetLegends(string? legendName)
     {
         const string url =
             "https://apexlegends.gamepedia.com/api.php?action=parse&format=json&page=Legends&redirects=1";
@@ -58,7 +58,7 @@ public class GamepediaService : IGamepediaService
                 )
                 .GetAttributeValue("data-src", "")
 
-            select new Legend()
+            select new LegendDTO()
             {
                 Name = name,
                 Description = description,

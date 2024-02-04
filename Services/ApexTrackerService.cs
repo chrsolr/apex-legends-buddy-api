@@ -10,7 +10,7 @@ public class ApexTrackerService : IApexTrackerService
         httpClient = _httpClient;
     }
 
-    public async Task<List<UsageRate>> GetUsageRates(string? legendName)
+    public async Task<List<UsageRateDTO>> GetUsageRates(string? legendName)
     {
         const string url = "https://tracker.gg/apex/insights";
         httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
@@ -58,7 +58,7 @@ public class ApexTrackerService : IApexTrackerService
         ).ToList();
 
         var usageRates = usage
-            .Select(element => new UsageRate()
+            .Select(element => new UsageRateDTO()
             {
                 Name = element.Name,
                 Rate = (element?.UsageRate ?? 0).ToString(CultureInfo.InvariantCulture),
