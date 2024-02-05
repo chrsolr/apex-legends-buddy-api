@@ -11,9 +11,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<GamepediaService>();
 builder.Services.AddHttpClient<ApexTrackerService>();
+builder.Services.AddHttpClient<UpdatorService>();
 builder
     .Services.AddScoped<IGamepediaService, GamepediaService>()
-    .AddScoped<IApexTrackerService, ApexTrackerService>();
+    .AddScoped<IApexTrackerService, ApexTrackerService>()
+    .AddScoped<IUpdatorService, UpdatorService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
