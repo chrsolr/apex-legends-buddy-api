@@ -13,7 +13,8 @@ builder.Services.AddHttpClient<GamepediaService>();
 builder.Services.AddHttpClient<ApexTrackerService>();
 builder
     .Services.AddScoped<IGamepediaService, GamepediaService>()
-    .AddScoped<IApexTrackerService, ApexTrackerService>();
+    .AddScoped<IApexTrackerService, ApexTrackerService>()
+    .AddScoped<ILegendService, LegendService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

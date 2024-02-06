@@ -4,17 +4,25 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 public class LegendsController : ControllerBase
 {
+    private readonly ILogger<LegendsController> logger;
+    private readonly ILegendService legendService;
     private readonly IGamepediaService gamepediaService;
 
-    public LegendsController(IGamepediaService _gamepediaService)
+    public LegendsController(
+        ILogger<LegendsController> _logger,
+        ILegendService _legendService,
+        IGamepediaService _gamepediaService
+    )
     {
+        logger = _logger;
+        legendService = _legendService;
         gamepediaService = _gamepediaService;
     }
 
     [HttpGet("legends")]
     public async Task<IActionResult> Get()
     {
-        var legends = await gamepediaService.GetLegends();
+        var legends = await legendService.GetLegends();
         if (legends is null)
         {
             return NotFound();
@@ -26,7 +34,7 @@ public class LegendsController : ControllerBase
     [HttpGet("legends/{legendName}")]
     public async Task<IActionResult> GetByName(string legendName)
     {
-        var legend = await gamepediaService.GetLegendsByName(legendName);
+        var legend = await legendService.GetLegendsByName(legendName);
         if (legend is null)
         {
             return NotFound();
@@ -35,7 +43,7 @@ public class LegendsController : ControllerBase
         return Ok(legend);
     }
 
-    // TODO: Add Authorize and Authentication
+    // TODO: Move to Updator Service and Add Authorize and Authentication
     [HttpPost("legends")]
     public async Task<IActionResult> Post([FromQuery] string? legendName)
     {
