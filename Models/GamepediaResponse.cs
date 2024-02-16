@@ -13,10 +13,23 @@ public class GamepediaResponseParse
 
     [JsonPropertyName("text")]
     public GamepediaResponseParseText Text { get; set; } = new GamepediaResponseParseText();
+
+    [JsonPropertyName("sections")]
+    public List<GamepediaResponseSection> Sections { get; set; } =
+        new List<GamepediaResponseSection>();
 }
 
 public class GamepediaResponseParseText
 {
     [JsonPropertyName("*")]
     public string? Asterisk { get; set; } = string.Empty;
+}
+
+public class GamepediaResponseSection
+{
+    [JsonPropertyName("anchor")]
+    public string Anchor { get; set; } = string.Empty;
+
+    [JsonPropertyName("index")]
+    public string Index { get; set; } = string.Empty;
 }

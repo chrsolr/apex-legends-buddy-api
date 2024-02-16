@@ -5,40 +5,59 @@ public class GamepediaService : IGamepediaService
 {
     private readonly HttpClient httpClient;
     private readonly DataContext context;
+    private readonly ILegendService legendService;
 
-    public GamepediaService(HttpClient _httpClient, DataContext _context)
+    public GamepediaService(
+        HttpClient _httpClient,
+        DataContext _context,
+        ILegendService _legendService
+    )
     {
         httpClient = _httpClient;
         context = _context;
+        legendService = _legendService;
     }
 
-    public async Task<List<LegendDTO>> GetLegends()
+    private async Task<int?> GetSectionIndex(string legendName, string sectionName)
     {
-        return await context
-            .Legends.Select(legend => new LegendDTO()
-            {
-                Name = legend.Name,
-                Description = legend.Description,
-                ImageUrl = legend.ImageUrl,
-                ClassName = legend.Class.Name,
-                ClassDescription = legend.Class.Description,
-                ClassIconUrl = legend.Class.IconUrl
-            })
-            .OrderBy(legend => legend.Name)
-            .ToListAsync();
+        string url =
+            $"https://apexlegends.gamepedia.com/api.php?action=parse&format=json&prop=sections&page={legendName}";
+
+        var response = await httpClient.GetFromJsonAsync<GamepediaResponse>(url);
+        if (response is null)
+        {
+            throw new Exception("Failed to get legends from service");
+        }
+
+        Console.WriteLine(response.Parse);
+
+        var sectionIndex = response.Parse.Sections.Find(v => v.Anchor == sectionName)?.Index;
+        if (String.IsNullOrEmpty(sectionIndex))
+        {
+            return null;
+        }
+
+        return Int32.TryParse(sectionIndex, out int parsedIndex) ? parsedIndex : null;
     }
 
     public async Task UpdateLegends(string? legendName)
     {
         var legends = await GetLegendsFromWiki(legendName);
+
         foreach (var legend in legends)
         {
-            if (context.Legends.Any(v => v.Name == legend.Name))
+            var dbLegend = await context.Legends.Where(v => v.Name == legend.Name).ToListAsync();
+            if (dbLegend is not null)
             {
-                continue;
+                context.Legends.RemoveRange(dbLegend);
+                await context.SaveChangesAsync();
             }
 
+            // TODO: Add Lore To Database and Legend
+            var quote = await GetLore(legend.Name);
+
             var legendClass = context.LegendClasses.FirstOrDefault(v => v.Name == legend.ClassName);
+
             context.Legends.Add(
                 new Legend()
                 {
@@ -59,22 +78,6 @@ public class GamepediaService : IGamepediaService
             );
             await context.SaveChangesAsync();
         }
-    }
-
-    public async Task<LegendDTO?> GetLegendsByName(string legendName)
-    {
-        return await context
-            .Legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper())
-            .Select(legend => new LegendDTO()
-            {
-                Name = legend.Name,
-                Description = legend.Description,
-                ImageUrl = legend.ImageUrl,
-                ClassName = legend.Class.Name,
-                ClassDescription = legend.Class.Description,
-                ClassIconUrl = legend.Class.IconUrl
-            })
-            .FirstOrDefaultAsync();
     }
 
     private async Task<List<LegendDTO>> GetLegendsFromWiki(string? legendName)
@@ -140,5 +143,34 @@ public class GamepediaService : IGamepediaService
         return string.IsNullOrEmpty(legendName)
             ? legends.ToList()
             : legends.Where(legend => legend.Name.ToUpper() == legendName.ToUpper()).ToList();
+    }
+
+    private async Task<List<string>> GetLore(string legendName)
+    {
+        var sectionIndex = await GetSectionIndex(legendName, "Lore");
+        if (sectionIndex is null)
+        {
+            throw new Exception("Failed to get legends from service");
+        }
+
+        string url =
+            $"https://apexlegends.gamepedia.com/api.php?action=parse&format=json&prop=text&page={legendName}&section={sectionIndex}";
+
+        var response = await httpClient.GetFromJsonAsync<GamepediaResponse>(url);
+        if (response is null)
+        {
+            throw new Exception("Failed to get legends from service");
+        }
+
+        var html = response.Parse.Text.Asterisk;
+        var document = new HtmlDocument();
+        document.LoadHtml(html);
+
+        var quotes = document
+            .DocumentNode.SelectNodes(".//p")
+            .Select(v => v.GetDirectInnerText().Trim())
+            .ToList<string>();
+
+        return quotes;
     }
 }
