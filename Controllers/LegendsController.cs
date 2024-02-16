@@ -6,17 +6,11 @@ public class LegendsController : ControllerBase
 {
     private readonly ILogger<LegendsController> logger;
     private readonly ILegendService legendService;
-    private readonly IGamepediaService gamepediaService;
 
-    public LegendsController(
-        ILogger<LegendsController> _logger,
-        ILegendService _legendService,
-        IGamepediaService _gamepediaService
-    )
+    public LegendsController(ILogger<LegendsController> _logger, ILegendService _legendService)
     {
         logger = _logger;
         legendService = _legendService;
-        gamepediaService = _gamepediaService;
     }
 
     [HttpGet("legends")]
@@ -41,13 +35,5 @@ public class LegendsController : ControllerBase
         }
 
         return Ok(legend);
-    }
-
-    // TODO: Move to Updator Service and Add Authorize and Authentication
-    [HttpPost("legends")]
-    public async Task<IActionResult> Post([FromQuery] string? legendName)
-    {
-        await gamepediaService.UpdateLegends(legendName);
-        return Ok();
     }
 }

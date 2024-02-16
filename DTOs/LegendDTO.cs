@@ -6,4 +6,5 @@ public record LegendDTO
     public required string ClassIconUrl { get; init; }
     public required string ClassName { get; init; }
     public required string ClassDescription { get; init; }
+    public List<string> Lore { get; init; } = new List<string>();
 }
