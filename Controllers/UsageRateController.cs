@@ -35,9 +35,8 @@ public class UsageRateController : ControllerBase
         return Ok(usageRate);
     }
 
-    // TODO: Add Authorize and Authentication
-    [HttpPost("usage-rate")]
-    public async Task<IActionResult> Post()
+    [HttpPut("usage-rate")]
+    public async Task<IActionResult> UpdateUsageRate()
     {
         await apexTrackerService.UpdateLegendUsageRates();
         return Ok();
