@@ -83,7 +83,7 @@ namespace apex_legends_buddy_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LegendId")
+                    b.Property<Guid?>("LegendId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Lore")
@@ -139,13 +139,9 @@ namespace apex_legends_buddy_api.Migrations
 
             modelBuilder.Entity("LegendLore", b =>
                 {
-                    b.HasOne("Legend", "Legend")
+                    b.HasOne("Legend", null)
                         .WithMany("Lore")
-                        .HasForeignKey("LegendId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Legend");
+                        .HasForeignKey("LegendId");
                 });
 
             modelBuilder.Entity("Legend", b =>

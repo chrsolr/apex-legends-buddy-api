@@ -1,6 +1,15 @@
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 
+record ColorRarity(
+    string Heirloom = "#ff4e1d",
+    string Legendary = "#cead21",
+    string Epic = "#b237c8",
+    string Rare = "#51a8d6",
+    string Common = "#a8a8a8",
+    string Base = "#010101"
+);
+
 public class GamepediaService : IGamepediaService
 {
     private readonly HttpClient httpClient;
@@ -46,17 +55,17 @@ public class GamepediaService : IGamepediaService
 
         foreach (var legend in legends)
         {
-            var dbLegend = await context.Legends.Where(v => v.Name == legend.Name).ToListAsync();
+            var dbLegend = await context.Legends.FirstOrDefaultAsync(v => v.Name == legend.Name);
             if (dbLegend is not null)
             {
-                context.Legends.RemoveRange(dbLegend);
+                context.LegendLores.RemoveRange(dbLegend.Lore);
+                context.Legends.Remove(dbLegend);
                 await context.SaveChangesAsync();
             }
 
-            // TODO: Add Lore To Database and Legend
-            var quote = await GetLore(legend.Name);
-
             var legendClass = context.LegendClasses.FirstOrDefault(v => v.Name == legend.ClassName);
+            var lore = await GetLore(legend.Name);
+            var skins = await GetSkins(legend.Name);
 
             context.Legends.Add(
                 new Legend()
@@ -73,7 +82,9 @@ public class GamepediaService : IGamepediaService
                             Name = legend.ClassName,
                             Description = legend.ClassDescription,
                             IconUrl = legend.ClassIconUrl,
-                        }
+                        },
+                    // Lore = lore.Select(lore => new LegendLore { Id = Guid.NewGuid(), Lore = lore, })
+                    //     .ToList()
                 }
             );
             await context.SaveChangesAsync();
@@ -172,5 +183,98 @@ public class GamepediaService : IGamepediaService
             .ToList<string>();
 
         return quotes;
+    }
+
+    private async Task<List<dynamic>> GetSkins(string legendName)
+    {
+        var sectionIndex = await GetSectionIndex(legendName, "Skins");
+        if (sectionIndex is null)
+        {
+            throw new Exception("Failed to get legends from service");
+        }
+
+        string url =
+            $"https://apexlegends.gamepedia.com/api.php?action=parse&format=json&prop=text&page={legendName}&section={sectionIndex}";
+
+        var response = await httpClient.GetFromJsonAsync<GamepediaResponse>(url);
+        if (response is null)
+        {
+            throw new Exception("Failed to get legends from service");
+        }
+
+        //     const $ = cheerio.load((await axios.get(url)).data.parse.text['*'])
+        //     const $root = $('.tabbertab')
+        //
+        //     return $root
+        //       .map((index, element) => {
+        //         const $element = $(element)
+        //         const [rarity] = $element.attr('title')?.trim().split(' ') || ['Base']
+        //         // @ts-ignore
+        //         const color = colors.rarities[rarity]
+        //
+        //         const skins = $element
+        //           .find('.gallerybox')
+        //           .map((index, element) => {
+        //             const $title = $(element).find('.gallerytext span:eq(0)')
+        //             const $skinImage = $(element).find('.thumb img')
+        //             const $cost = $(element).find('.gallerytext span:eq(1)')
+        //             const costContent = $cost
+        //               .contents()
+        //               .map((i, v) => $(v).text().trim())
+        //               .get()
+        //               .filter((v) => v)
+        //
+        //             const name = $title.text().trim()
+        //             const rarity = $title.css('color').trim()
+        //             const imageUrl = $skinImage.attr('src')
+        //             const materialImageUrl = $cost.find('a img').attr('src')
+        //
+        //             const [materialCost] = costContent
+        //             const requirement = costContent.filter(
+        //               (v) => v && v.indexOf('[note') === -1,
+        //             )
+        //             return {
+        //               id: index,
+        //               name,
+        //               rarity,
+        //               imageUrl,
+        //               materialImageUrl,
+        //               materialCost,
+        //               requirement:
+        //                 requirement.length && requirement.length > 2
+        //                   ? requirement.splice(1, 3).join(' ')
+        //                   : undefined,
+        //             }
+        //           })
+        //           .get()
+        //         return { rarity, color, skins }
+        //       })
+        //       .get()
+        //
+
+
+        var html = response.Parse.Text.Asterisk;
+        var document = new HtmlDocument();
+        document.LoadHtml(html);
+
+        ColorRarity colors = new();
+
+        // ul[contains(@class, 'gallery')
+        var root = document.DocumentNode.SelectSingleNode(".//div[contains(@class, 'tabber')]");
+
+        var skins = root.SelectNodes(".//ul[contains(@class, 'gallery mw-gallery-nolines')]")
+            .Select(v => new
+            {
+                Name = v.SelectSingleNode(".//div[contains(@class, 'gallerytext')]//span[1]")
+                    .InnerText.Trim(),
+            })
+            .ToList<dynamic>();
+
+        foreach (var skin in skins)
+        {
+            Console.WriteLine($"Skins***************************: {skin.Name}");
+        }
+
+        return skins;
     }
 }

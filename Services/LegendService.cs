@@ -19,7 +19,8 @@ public class LegendService : ILegendService
                 ImageUrl = legend.ImageUrl,
                 ClassName = legend.Class.Name,
                 ClassDescription = legend.Class.Description,
-                ClassIconUrl = legend.Class.IconUrl
+                ClassIconUrl = legend.Class.IconUrl,
+                Lore = legend.Lore.Select(lore => lore.Lore).ToList()
             })
             .OrderBy(legend => legend.Name)
             .ToListAsync();

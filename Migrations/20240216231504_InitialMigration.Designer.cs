@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace apex_legends_buddy_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240216063653_updated-cascade-delete-3")]
-    partial class updatedcascadedelete3
+    [Migration("20240216231504_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,7 +86,7 @@ namespace apex_legends_buddy_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LegendId")
+                    b.Property<Guid?>("LegendId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Lore")
@@ -142,13 +142,9 @@ namespace apex_legends_buddy_api.Migrations
 
             modelBuilder.Entity("LegendLore", b =>
                 {
-                    b.HasOne("Legend", "Legend")
+                    b.HasOne("Legend", null)
                         .WithMany("Lore")
-                        .HasForeignKey("LegendId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Legend");
+                        .HasForeignKey("LegendId");
                 });
 
             modelBuilder.Entity("Legend", b =>

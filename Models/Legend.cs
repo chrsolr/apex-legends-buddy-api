@@ -5,6 +5,6 @@ public class Legend
     public required string Description { get; set; }
     public required string ImageUrl { get; set; }
     public required LegendClass Class { get; set; }
-    public List<LegendLore>? Lore { get; set; }
+    public List<LegendLore> Lore { get; set; } = new();
     public UsageRate? UsageRate { get; set; }
 }
